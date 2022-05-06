@@ -1,10 +1,16 @@
-import React, {useState} from 'react';
-import { paletas } from "mocks/paletas.js";
+import React, {useState, useEffect} from 'react';
+import PaletaListaItem from 'components/PaletaListaItem/PaletaListaItem';
+import {PaletaService} from 'services/PaletaService';
+import PaletaDetalhesModal from 'components/PaletaDetalhesModal/PaletaDetalhesModal';
 import './PaletaLista.css'
 
 function PaletaLista() {
+
+    const[paletas, setPaletas] = useState([]);
     
     const [paletaSelecionada, setPaletaSelecionada] = useState({});
+
+    const [paletaModal, setPaletaModal] = useState (false)
 
     const adicionarItem = (paletaIndex) => {
         const paleta = { [paletaIndex]: Number(paletaSelecionada[paletaIndex] || 0) +1 }
@@ -16,29 +22,27 @@ function PaletaLista() {
         setPaletaSelecionada({ ...paletaSelecionada, ...paleta});
     }
 
-    const badgeCounter = (canRender, index) =>
-	    Boolean(canRender) && (<span className="PaletaListaItem__badge"> {paletaSelecionada[index]} </span>);
-
-    const removeButton = (canRender, index) =>
-	    Boolean(canRender) && (<button className="Acoes__remover" onClick={() => removerItem(index)}>remover</button>);
-
+    const getLista = async () =>{
+        const response = await PaletaService.getLista();
+        setPaletas(response);
+    }
+    useEffect(()=>{
+        getLista();
+    },[]);
+   
     
     return  <div className="PaletaLista">
         {paletas.map((paleta, index) => (
-                <div className="PaletaListaItem" key={`PaletaListaItem-${index}`}>
-                {badgeCounter(paletaSelecionada[index], index)}
-                <div>
-                    <div className="PaletaListaItem__titulo">  {paleta.titulo} </div>
-                    <div className="PaletaListaItem__preco">R$ {paleta.preco.toFixed(2)}</div>
-                    <div className="PaletaListaItem__descricao"> {paleta.descricao} </div>
-                    <div className="PaletaListaItem__acoes Acoes">
-                        <button className={`Acoes__adicionar ${!paletaSelecionada[index] && "Acoes__adicionar--preencher"}`} onClick={() => adicionarItem(index)}>adicionar</button>
-                        {removeButton(paletaSelecionada[index], index)}
-                    </div>
-                </div>
-                    <img className="PaletaListaItem__foto" src={paleta.foto} alt={`Paleta de ${paleta.sabor}`} />
-                </div>
+            <PaletaListaItem 
+            key={`PaletaListaItem-${index}`}
+            paleta={paleta}
+            quantidadeSelecionada={paletaSelecionada[index]}
+            index={index} 
+            onRemove={index => removerItem(index)}
+            onAdd={index => adicionarItem(index)}
+            clickItem={(paletaId)=> setPaletaModal(paleta)}/>    
         ))}
+        {paletaModal && <PaletaDetalhesModal paleta={paletaModal} closeModal={()=> setPaletaModal(false)}/>}
     </div>;
 }
   
