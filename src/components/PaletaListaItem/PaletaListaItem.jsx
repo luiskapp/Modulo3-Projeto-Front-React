@@ -9,7 +9,7 @@ function PaletaListaItem({paleta, quantidadeSelecionada, index, onRemove, onAdd,
     Boolean(canRender) && (<button className="Acoes__remover" onClick={(e) => {e.stopPropagation(); onRemove(index);}}>remover</button>);
 
     return (
-        <div className="PaletaListaItem" onclick={()=>clickItem[PaletaListaItem.id]}> 
+        <div className="PaletaListaItem" onClick={()=>clickItem(paleta.id)}> 
         {badgeCounter(quantidadeSelecionada, index)}
             <div>
                 <div className="PaletaListaItem__titulo">  {paleta.titulo} </div>

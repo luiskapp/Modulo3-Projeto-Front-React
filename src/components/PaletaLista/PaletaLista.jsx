@@ -10,7 +10,7 @@ function PaletaLista() {
     
     const [paletaSelecionada, setPaletaSelecionada] = useState({});
 
-    const [paletaModal, setPaletaModal] = useState (false)
+    const [paletaModal, setPaletaModal] = useState(false);
 
     const adicionarItem = (paletaIndex) => {
         const paleta = { [paletaIndex]: Number(paletaSelecionada[paletaIndex] || 0) +1 }
@@ -26,6 +26,12 @@ function PaletaLista() {
         const response = await PaletaService.getLista();
         setPaletas(response);
     }
+
+    const getPaletaById = async (paletaId) => {
+        const response = await PaletaService.getById(paletaId);
+        setPaletaModal(response);
+    };
+
     useEffect(()=>{
         getLista();
     },[]);
@@ -38,11 +44,11 @@ function PaletaLista() {
             paleta={paleta}
             quantidadeSelecionada={paletaSelecionada[index]}
             index={index} 
-            onRemove={index => removerItem(index)}
             onAdd={index => adicionarItem(index)}
-            clickItem={(paletaId)=> setPaletaModal(paleta)}/>    
+            onRemove={index => removerItem(index)}
+            clickItem={(paletaId) => getPaletaById(paletaId)}/>    
         ))}
-        {paletaModal && <PaletaDetalhesModal paleta={paletaModal} closeModal={()=> setPaletaModal(false)}/>}
+        {paletaModal && <PaletaDetalhesModal paleta={paletaModal} closeModal={() => setPaletaModal(false)} />}
     </div>;
 }
   
